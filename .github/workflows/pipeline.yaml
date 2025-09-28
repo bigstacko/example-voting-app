@@ -26,7 +26,7 @@ jobs:
       - name: Build and push Vote-app Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./vote/templates/
-          file: ./vote/templates/Dockerfile
+          context: ./vote
+          file: ./vote/Dockerfile
           push: true
-          tags: stacko/vote-app:${{ github.sha }}
+          tags: stacko/vote-app:${{ github.run_number }}
