@@ -23,9 +23,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Step 3: Build and push Docker image
-      - name: Build and push Docker image
+      - name: Build and push Vote-app Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./vote/templates/
+          file: ./vote/templates/Dockerfile
           push: true
           tags: stacko/vote-app:${{ github.sha }}
