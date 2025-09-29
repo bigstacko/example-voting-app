@@ -36,3 +36,43 @@ jobs:
         run: |
           chmod +x ./update-deployment.sh
           ./update-deployment.sh ${{ github.run_number }}
+            
+      # Step 5: Health check via ArgoCD, rollback if unhealthy
+      - name: Check ArgoCD app health and rollback if needed
+        run: |
+          chmod +x ./rollback-deployment.sh
+          argocd login ${{ secrets.ARGOCD_SERVER }} \
+            --username ${{ secrets.ARGOCD_USERNAME }} \
+            --password ${{ secrets.ARGOCD_PASSWORD }} --insecure
+          if ! argocd app wait vote-app --health --timeout 120; then
+            echo "⚠️ App unhealthy, triggering rollback..."
+            ./rollback-deployment.sh
+          fi
+
+      # Step 6: Notify on success
+      - name: Send success email
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "✅ Deployment succeeded for vote-app"
+          to: "philipstack.co@gmail.com"
+          from: "ci-cd@example.com"
+          body: "Deployment succeeded with image stacko/vote-app:${{ github.run_number }}"
+
+      # Step 7: Notify on failure
+      - name: Send failure email
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "❌ Deployment failed for vote-app"
+          to: "phillipstack.co@gmail.com"
+          from: "ci-cd@example.com"
+          body: "Deployment failed on run ${{ github.run_number }}. Rollback may have been triggered automatically."

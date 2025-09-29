@@ -1,0 +1,28 @@
+name: Manual Rollback Deployment
+
+on:
+  workflow_dispatch:   # enables "Run workflow" button
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run rollback script
+        run: |
+          chmod +x ./rollback-deployment.sh
+          ./rollback-deployment.sh
+
+      - name: Send rollback notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "⚠️ Manual rollback executed for vote-app"
+          to: "phillipstack.co@gmail.com"
+          from: "ci-cd@example.com"
+          body: "A manual rollback was executed. The deployment was reverted to the last known good version."
