@@ -21,6 +21,5 @@ spec:
         - containerPort: 80
           name: vote
       imagepullSecrets:
-      - name: regcred
----
+      - name: dockerhub-secret
 ---
