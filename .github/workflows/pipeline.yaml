@@ -1,17 +1,17 @@
 # .github/workflows/docker-build-push.yml
-name: Build and Push to DockerHub
+name: Build, Push to DockerHub and Update K8s Manifest
 
 on:
   push:
     branches:
-      - main  # or whichever branch you want to trigger on
+      - main  
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repo
+      # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -30,3 +30,9 @@ jobs:
           file: ./vote/Dockerfile
           push: true
           tags: stacko/vote-app:${{ github.run_number }}
+      
+      # Step 4: Update Kubernetes manifest with new image tag
+      - name: Update Kubernetes manifest with new image tag
+        run: |
+          chmod +x ./update-deployment.sh
+          ./update-deployment.sh ${{ github.run_number }}
