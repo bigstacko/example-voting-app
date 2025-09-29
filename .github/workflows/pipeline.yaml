@@ -36,7 +36,13 @@ jobs:
         run: |
           chmod +x ./update-deployment.sh
           ./update-deployment.sh ${{ github.run_number }}
-            
+      
+      # Step 5: Install ArgoCD CLI
+      - name: Install ArgoCD CLI
+        run: |
+          curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          chmod +x /usr/local/bin/argocd    
+
       # Step 5: Health check via ArgoCD, rollback if unhealthy
       - name: Check ArgoCD app health and rollback if needed
         run: |
