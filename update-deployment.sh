@@ -4,7 +4,7 @@ set -euo pipefail
 
 # --- Config ---
 IMAGE="stacko/vote-app"
-DEPLOY_FILE="k8s/vote-deployment.yaml"   # adjust to your manifest file
+DEPLOY_FILE="k8s-specifications/vote-deployment.yaml"   # adjust to your manifest file
 BRANCH="main"
 
 # --- Ensure a new tag was passed in ---
