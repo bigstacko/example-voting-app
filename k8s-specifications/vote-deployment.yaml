@@ -22,3 +22,4 @@ spec:
           name: vote
       imagepullSecrets:
       - name: regcred
+---
