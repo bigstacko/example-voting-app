@@ -37,23 +37,23 @@ jobs:
           chmod +x ./update-deployment.sh
           ./update-deployment.sh ${{ github.run_number }}
       
-      # Step 5: Install ArgoCD CLI
-      - name: Install ArgoCD CLI
-        run: |
-          curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-          chmod +x /usr/local/bin/argocd    
+      # # Step 5: Install ArgoCD CLI
+      # - name: Install ArgoCD CLI
+      #   run: |
+      #     curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+      #     chmod +x /usr/local/bin/argocd    
 
-      # Step 5: Health check via ArgoCD, rollback if unhealthy
-      - name: Check ArgoCD app health and rollback if needed
-        run: |
-          chmod +x ./rollback-deployment.sh
-          argocd login ${{ secrets.ARGOCD_SERVER }} \
-            --username ${{ secrets.ARGOCD_USERNAME }} \
-            --password ${{ secrets.ARGOCD_PASSWORD }} --insecure
-          if ! argocd app wait vote-app --health --timeout 120; then
-            echo "⚠️ App unhealthy, triggering rollback..."
-            # ./rollback-deployment.sh
-          fi
+      # # Step 5: Health check via ArgoCD, rollback if unhealthy
+      # - name: Check ArgoCD app health and rollback if needed
+      #   run: |
+      #     chmod +x ./rollback-deployment.sh
+      #     argocd login ${{ secrets.ARGOCD_SERVER }} \
+      #       --username ${{ secrets.ARGOCD_USERNAME }} \
+      #       --password ${{ secrets.ARGOCD_PASSWORD }} --insecure
+      #     if ! argocd app wait vote-app --health --timeout 120; then
+      #       echo "⚠️ App unhealthy, triggering rollback..."
+      #       ./rollback-deployment.sh
+      #     fi
 
       # Step 6: Notify on success
       - name: Send success email
