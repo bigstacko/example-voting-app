@@ -1,9 +1,8 @@
-#This script rolls back deployment to previous stable version based on commit history
 #!/usr/bin/env bash
 set -euo pipefail
 
 # --- Config ---
-DEPLOY_FILE="k8s-specifications/vote-deployment.yaml"
+DEPLOY_FILE="k8s/vote-deployment.yaml"
 BRANCH="main"
 
 # --- Ensure file exists ---
@@ -12,18 +11,29 @@ if [ ! -f "$DEPLOY_FILE" ]; then
   exit 1
 fi
 
-# --- Extract last 2 tags from Git history ---
-TAGS=($(git log -p -n 10 -- "$DEPLOY_FILE" | grep "image:" | sed -E 's/.*:([0-9]+).*/\1/' | uniq | head -2))
+# --- Get current tag from working file ---
+CURRENT_TAG=$(grep "image: stacko/vote-app:" "$DEPLOY_FILE" | sed -E 's/.*:([0-9]+).*/\1/')
 
-if [ ${#TAGS[@]} -lt 2 ]; then
-  echo "❌ Not enough history to roll back."
+# --- Get previous tag from one commit ago ---
+if git rev-parse HEAD~1 >/dev/null 2>&1; then
+  PREVIOUS_TAG=$(git show HEAD~1:$DEPLOY_FILE | grep "image: stacko/vote-app:" | sed -E 's/.*:([0-9]+).*/\1/')
+else
+  echo "❌ No previous commit found — cannot roll back."
+  exit 0
+fi
+
+# --- Safety check ---
+if [ -z "$CURRENT_TAG" ] || [ -z "$PREVIOUS_TAG" ]; then
+  echo "❌ Could not determine current or previous tag."
   exit 1
 fi
 
-CURRENT_TAG=${TAGS[0]}
-PREVIOUS_TAG=${TAGS[1]}
+if [ "$CURRENT_TAG" == "$PREVIOUS_TAG" ]; then
+  echo "ℹ️ Current and previous tags are the same ($CURRENT_TAG). Nothing to roll back."
+  exit 0
+fi
 
-# --- Replace current with previous ---
+# --- Perform rollback ---
 echo "🔄 Rolling back from $CURRENT_TAG → $PREVIOUS_TAG"
 sed -i.bak "s|:$CURRENT_TAG|:$PREVIOUS_TAG|" "$DEPLOY_FILE"
 rm -f "$DEPLOY_FILE.bak"
@@ -36,4 +46,3 @@ git commit -m "rollback: revert image from $CURRENT_TAG to $PREVIOUS_TAG"
 git push origin "$BRANCH"
 
 echo "✅ Rolled back deployment to $PREVIOUS_TAG"
-
