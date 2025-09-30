@@ -65,7 +65,7 @@ jobs:
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "✅ Deployment succeeded for vote-app"
-          to: "philipstack.co@gmail.com"
+          to: "phillipstack.co@gmail.com"
           from: "ci-cd@example.com"
           body: "Deployment succeeded with image stacko/vote-app:${{ github.run_number }}"
 
