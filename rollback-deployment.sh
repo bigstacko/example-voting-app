@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # --- Config ---
-DEPLOY_FILE="k8s/vote-deployment.yaml"
+DEPLOY_FILE="k8s-specifications/vote-deployment.yaml"
 BRANCH="main"
 
 # --- Ensure file exists ---
