@@ -15,7 +15,7 @@ spec:
         app: vote
     spec:
       containers:
-      - image: stacko/vote-app:16
+      - image: stacko/vote-app:17
         name: vote
         ports:
         - containerPort: 80
